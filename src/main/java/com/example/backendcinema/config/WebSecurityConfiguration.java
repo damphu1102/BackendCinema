@@ -36,7 +36,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
 // config những API ko cần xác thực
                 .antMatchers("/banner", "/auth/login", "/movie",
-                        "/movie/filter", "/movie/{movieId}", "/zalopay/order").permitAll()
+                        "/movie/filter", "/movie/{movieId}", "/zalopay/order", "/account/create").permitAll()
 
 // Config những API phải có Authority là Admin thì mới được truy cập
                 .antMatchers(HttpMethod.GET, "/account").hasAuthority("Admin")

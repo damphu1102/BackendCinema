@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ public class Account {
     @Column (name = "ACCOUNT_ID")
     private int accountId;
 
-    @Column(name = "USER_NAME", length = 100, nullable = false)
+    @Column(name = "USER_NAME", length = 20, nullable = false, unique = true)
     private String userName;
 
     @Column(name = "FULL_NAME", length = 100, nullable = false)
@@ -29,6 +30,22 @@ public class Account {
 
     @Column(name = "PHONE", length = 10, nullable = false)
     private String phoneNumber;
+
+    @Column(name = "CITY", length = 10)
+    private String city;
+
+    @Column(name = "DISTRICT", length = 10)
+    private String district;
+
+    @Column(name = "ADDRESS", length = 20)
+    private String address;
+
+    @Column(name = "DATE_BIRD")
+    private LocalDate dateBird;
+
+    @Column(name = "ROLE_GENDER")
+    @Enumerated(EnumType.STRING)
+    private RoleGender roleGender;
 
     @Column(name = "ROLE_ACCOUNT", nullable = false)
     @Enumerated(EnumType.STRING)
