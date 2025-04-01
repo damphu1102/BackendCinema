@@ -10,4 +10,10 @@ public interface AccountService extends UserDetailsService {
     List<Account> getAll();
 
     Account create(AccountCreateDto dto);
+
+    boolean isUsernameExists(String username);
+
+    boolean authenticate(String username, String password);
+
+
 }

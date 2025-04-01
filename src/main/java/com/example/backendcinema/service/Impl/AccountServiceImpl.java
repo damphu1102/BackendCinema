@@ -42,6 +42,21 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public boolean isUsernameExists(String username) {
+        return accountRepository.findByUserName(username) != null;
+    }
+
+    public boolean authenticate(String username, String password) {
+        Account account = accountRepository.findByUserName(username);
+        if (account == null) {
+            return false;
+        }
+
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // Tạo đối tượng mã hóa
+        return passwordEncoder.matches(password, account.getPassWord()); // So sánh mật khẩu đã mã hóa
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Account> optional = accountRepository.findFirstByUserName(username);
         if (optional.isEmpty()){
