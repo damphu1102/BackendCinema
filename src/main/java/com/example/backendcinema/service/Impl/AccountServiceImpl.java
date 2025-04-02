@@ -1,6 +1,7 @@
 package com.example.backendcinema.service.Impl;
 
 import com.example.backendcinema.Dto.Account.AccountCreateDto;
+import com.example.backendcinema.Dto.Account.AccountUpdateDto;
 import com.example.backendcinema.entity.Account.Account;
 import com.example.backendcinema.entity.Account.RoleAccount;
 import com.example.backendcinema.repository.AccountRepository;
@@ -30,6 +31,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Account findById(int accountId) {
+        Optional<Account> optionalAccount = accountRepository.findById(accountId);
+        if (optionalAccount.isPresent()){
+            return optionalAccount.get();
+        }
+        return null;
+    }
+
+    @Override
     public Account create(AccountCreateDto dto) {
         Account account = new Account();
         BeanUtils.copyProperties(dto, account);
@@ -39,6 +49,38 @@ public class AccountServiceImpl implements AccountService {
         account.setPassWord(encodedPassword);
         account.setRoleAccount(RoleAccount.User);
         return accountRepository.save(account);
+    }
+
+    public Account update(AccountUpdateDto dto) {
+        Account account = accountRepository.findById(dto.getAccountId()).orElse(null);
+
+        if (account != null) {
+            if (dto.getAddress() != null) {
+                account.setAddress(dto.getAddress());
+            }
+            if (dto.getCity() != null) {
+                account.setCity(dto.getCity());
+            }
+            if (dto.getDateBird() != null) {
+                account.setDateBird(dto.getDateBird());
+            }
+            if (dto.getDistrict() != null) {
+                account.setDistrict(dto.getDistrict());
+            }
+            if (dto.getEmailAccount() != null && !dto.getEmailAccount().equals("")) {
+                account.setEmailAccount(dto.getEmailAccount());
+            }
+            if (dto.getPhoneNumber() != null && !dto.getPhoneNumber().equals("")) {
+                account.setPhoneNumber(dto.getPhoneNumber());
+            }
+            if (dto.getRoleGender() != null) {
+                account.setRoleGender(dto.getRoleGender());
+            }
+
+            return accountRepository.save(account);
+        } else {
+            return null; // Hoặc throw exception
+        }
     }
 
     @Override

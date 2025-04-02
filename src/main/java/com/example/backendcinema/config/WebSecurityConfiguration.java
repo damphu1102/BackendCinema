@@ -42,13 +42,17 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 // Config những API phải có Authority là Admin thì mới được truy cập
                 .antMatchers(HttpMethod.GET, "/account").hasAuthority("Admin")
 
+                .antMatchers(HttpMethod.GET, "/account/{accountId}").hasAuthority("User")
+
+
 // Config những API phải có Authority là User thì mới được truy cập
-                .antMatchers(HttpMethod.PUT, "/seat/{seat_id}/{newStatus}").hasAuthority("User")
+                .antMatchers(HttpMethod.PUT, "/seat/{seat_id}/{newStatus}", "/account/{accountId}").hasAuthority("User")
 
 // Config những API phải có Authority là ADMIN hoặc User thì mới được truy cập
                 .antMatchers("/cinema", "/cinema/filter",
                         "/showtime", "/showtime/filter",
-                        "/seat", "/service", "/voucher").hasAnyAuthority("Admin", "User")
+                        "/seat", "/service", "/voucher",
+                        "/account/{accountId}").hasAnyAuthority("Admin", "User")
                 .anyRequest().authenticated()// Những đường dẫn còn lại cần được xác thực
                 .and().httpBasic()// Kích hoạt cấu hình http basic trong Spring Security
 

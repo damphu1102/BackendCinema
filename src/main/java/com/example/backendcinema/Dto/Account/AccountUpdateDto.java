@@ -8,10 +8,7 @@ import java.time.LocalDate;
 @Data
 public class AccountUpdateDto {
     private int accountId;
-    private String userName;
-    private String fullName;
     private String emailAccount;
-    private String passWord;
     private String phoneNumber;
     private String city;
     private String district;

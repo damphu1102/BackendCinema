@@ -1,12 +1,13 @@
 package com.example.backendcinema.controller;
 
 import com.example.backendcinema.Dto.Account.AccountCreateDto;
-import com.example.backendcinema.Dto.LoginDto;
+import com.example.backendcinema.Dto.Account.AccountUpdateDto;
 import com.example.backendcinema.entity.Account.Account;
 import com.example.backendcinema.service.AccountService;
 import modal.LoginRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,12 @@ public class AccountController {
       return accountService.getAll();
     }
 
+    @PreAuthorize("hasAnyAuthority('User')")
+    @GetMapping("/{accountId}")
+    public Account findById (@PathVariable int accountId){
+        return accountService.findById(accountId);
+    }
+
     @GetMapping("/check_username")
     public boolean checkUsernameAvailability(@RequestParam String username) {
         return accountService.isUsernameExists(username);
@@ -40,4 +47,17 @@ public class AccountController {
     public Account create(@RequestBody AccountCreateDto dto){
         return accountService.create(dto);
     }
+
+    @PreAuthorize("hasAnyAuthority('User')")
+    @PutMapping("/{accountId}")
+    public ResponseEntity<Account> updateAccount(@PathVariable Integer accountId, @RequestBody AccountUpdateDto dto) {
+        dto.setAccountId(accountId); // Đảm bảo accountId trong dto trùng với id trên path
+        Account updatedAccount = accountService.update(dto);
+        if (updatedAccount != null) {
+            return ResponseEntity.ok(updatedAccount);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
+
