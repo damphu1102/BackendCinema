@@ -2,8 +2,10 @@ package com.example.backendcinema.service.Impl;
 
 import com.example.backendcinema.Dto.Account.AccountCreateDto;
 import com.example.backendcinema.Dto.Account.AccountUpdateDto;
+import com.example.backendcinema.Dto.Account.UpdatePassDto;
 import com.example.backendcinema.entity.Account.Account;
 import com.example.backendcinema.entity.Account.RoleAccount;
+import com.example.backendcinema.entity.Account.RoleGender;
 import com.example.backendcinema.repository.AccountRepository;
 import com.example.backendcinema.service.AccountService;
 import org.springframework.beans.BeanUtils;
@@ -48,6 +50,7 @@ public class AccountServiceImpl implements AccountService {
         String encodedPassword = passwordEncoder.encode(dto.getPassWord());
         account.setPassWord(encodedPassword);
         account.setRoleAccount(RoleAccount.User);
+        account.setRoleGender(RoleGender.Nam);
         return accountRepository.save(account);
     }
 
@@ -80,6 +83,20 @@ public class AccountServiceImpl implements AccountService {
             return accountRepository.save(account);
         } else {
             return null; // Hoặc throw exception
+        }
+    }
+
+    @Override
+    public void updatePass(UpdatePassDto dto) {
+        Account account = accountRepository.findById(dto.getAccountId()).orElse(null);
+        if (account != null){
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            String encodedNewPassword = passwordEncoder.encode(dto.getNewPassWord());
+            account.setPassWord(encodedNewPassword);
+            accountRepository.save(account);
+        } else {
+            // Xử lý trường hợp tài khoản không tồn tại (ví dụ: ném ngoại lệ)
+            throw new RuntimeException("Account not found with id: " + dto.getAccountId());
         }
     }
 

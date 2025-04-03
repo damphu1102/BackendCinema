@@ -31,10 +31,10 @@ public class Account {
     @Column(name = "PHONE", length = 10, nullable = false)
     private String phoneNumber;
 
-    @Column(name = "CITY", length = 10)
+    @Column(name = "CITY", length = 30)
     private String city;
 
-    @Column(name = "DISTRICT", length = 10)
+    @Column(name = "DISTRICT", length = 20)
     private String district;
 
     @Column(name = "ADDRESS", length = 20)
