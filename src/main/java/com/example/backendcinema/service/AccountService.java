@@ -21,6 +21,8 @@ public interface AccountService extends UserDetailsService {
 
     boolean isUsernameExists(String username);
 
+    boolean checkPass(int accountId, String passWord);
+
     boolean authenticate(String username, String password);
 
 

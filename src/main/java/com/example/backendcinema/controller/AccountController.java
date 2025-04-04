@@ -6,6 +6,7 @@ import com.example.backendcinema.Dto.Account.UpdatePassDto;
 import com.example.backendcinema.entity.Account.Account;
 import com.example.backendcinema.service.AccountService;
 import modal.LoginRequest;
+import modal.PassRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,11 @@ public class AccountController {
     @GetMapping("/check_username")
     public boolean checkUsernameAvailability(@RequestParam String username) {
         return accountService.isUsernameExists(username);
+    }
+
+    @PostMapping("/check_pass")
+    public boolean checkPass(@RequestBody PassRequest request) {
+        return accountService.checkPass(request.getAccountId(), request.getPassWord());
     }
 
     @PostMapping("/authenticate")

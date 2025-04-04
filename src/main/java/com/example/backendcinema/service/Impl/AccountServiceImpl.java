@@ -105,6 +105,17 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findByUserName(username) != null;
     }
 
+    @Override
+    public boolean checkPass(int accountId, String passWord) {
+        Account account = accountRepository.findById(accountId).orElse(null);
+        if (account == null) {
+            return false; // Tài khoản không tồn tại
+        }
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // Tạo đối tượng mã hóa
+        return passwordEncoder.matches(passWord, account.getPassWord()); // So sánh mật khẩu đã mã hóa
+    }
+
+
     public boolean authenticate(String username, String password) {
         Account account = accountRepository.findByUserName(username);
         if (account == null) {
