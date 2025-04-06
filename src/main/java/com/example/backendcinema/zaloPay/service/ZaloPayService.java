@@ -1,9 +1,8 @@
-package zalopay.service;
+package com.example.backendcinema.zaloPay.service;
 
-import zalopay.dto.OrderRequest;
-import zalopay.dto.OrderResponse;
+import com.example.backendcinema.zaloPay.dto.OrderRequest;
+import com.example.backendcinema.zaloPay.dto.OrderResponse;
 
 public interface ZaloPayService {
-    OrderResponse createOrder(OrderRequest request) throws Exception;
-
+    OrderResponse createZaloPayOrder(OrderRequest orderRequest);
 }

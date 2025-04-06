@@ -1,36 +1,34 @@
-package zalopay.controller;
+package com.example.backendcinema.zaloPay.controller;
 
+import com.example.backendcinema.zaloPay.dto.OrderRequest;
+import com.example.backendcinema.zaloPay.dto.OrderResponse;
+import com.example.backendcinema.zaloPay.service.ZaloPayService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import zalopay.dto.OrderRequest;
-import zalopay.dto.OrderResponse;
-import zalopay.service.ZaloPayService;
+
+import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/api/orders")
 public class OrderController {
 
-    private final ZaloPayService zaloPayService;
-
     @Autowired
-    public OrderController(ZaloPayService zaloPayService) {
-        this.zaloPayService = zaloPayService;
-    }
+    private ZaloPayService zaloPayService;
 
-    @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request) {
+    @PostMapping("/createOrder")
+    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest) {
         try {
-            OrderResponse response = zaloPayService.createOrder(request);
-            return ResponseEntity.ok(response);
+            OrderResponse orderResponse = zaloPayService.createZaloPayOrder(orderRequest);
+            return ResponseEntity.ok(orderResponse);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body(new OrderResponse(new org.json.JSONObject()
-                            .put("returncode", -1)
-                            .put("returnmessage", e.getMessage())));
+            // Xử lý lỗi và trả về mã trạng thái HTTP thích hợp
+            OrderResponse errorResponse = new OrderResponse();
+            errorResponse.setReturnCode("-1");
+            errorResponse.setReturnMessage("Lỗi xử lý đơn hàng: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 }

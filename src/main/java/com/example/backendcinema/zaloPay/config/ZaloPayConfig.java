@@ -1,24 +1,8 @@
-package zalopay.config;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
+package com.example.backendcinema.zaloPay.config;
 
 public class ZaloPayConfig {
-    private static final Map<String, String> config = new HashMap<String, String>(){{
-        put("app_id", "2553");
-        put("key1", "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL");
-        put("key2", "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz");
-        put("endpoint", "https://sb-openapi.zalopay.vn/v2/create");
-    }};
-
-    public static String getConfig(String key) {
-        return config.get(key);
-    }
-
-    public static String getCurrentTimeString(String format) {
-        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT+7"));
-        SimpleDateFormat fmt = new SimpleDateFormat(format);
-        fmt.setCalendar(cal);
-        return fmt.format(cal.getTimeInMillis());
-    }
+    public static final String APP_ID = "2553"; // Thay bằng APP_ID của bạn
+    public static final String KEY1 = "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL"; // Thay bằng KEY1 của bạn
+    public static final String KEY2 = "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz"; // Thay bằng KEY2 của bạn
+    public static final String API_URL = "https://sandbox.zalopay.com.vn/v2/createorder";
 }
