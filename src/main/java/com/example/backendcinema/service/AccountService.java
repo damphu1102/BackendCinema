@@ -23,7 +23,7 @@ public interface AccountService extends UserDetailsService {
 
     boolean checkPass(int accountId, String passWord);
 
-    boolean authenticate(String username, String password);
+    boolean authenticateUser(String username, String password);
 
 
 }

@@ -37,7 +37,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 // config những API ko cần xác thực
                 .antMatchers("/banner", "/auth/login", "/movie",
                         "/movie/filter", "/movie/{movieId}", "/zalopay/order",
-                        "/account/create", "/account/check_username", "/account/authenticate", "/account/check_pass",
+                        "/account/create", "/account/check_username", "/account/authenticateUser", "/account/check_pass",
                         "/createOrder").permitAll()
 
 // Config những API phải có Authority là Admin thì mới được truy cập

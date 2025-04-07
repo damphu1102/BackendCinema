@@ -45,9 +45,9 @@ public class AccountController {
         return accountService.checkPass(request.getAccountId(), request.getPassWord());
     }
 
-    @PostMapping("/authenticate")
-    public boolean authenticate(@RequestBody LoginRequest request) {
-        return accountService.authenticate(request.getUserName(), request.getPassWord());
+    @PostMapping("/authenticateUser")
+    public boolean authenticateUser(@RequestBody LoginRequest request) {
+        return accountService.authenticateUser(request.getUserName(), request.getPassWord());
     }
 
     @PostMapping("/create")
