@@ -2,7 +2,10 @@ package com.example.backendcinema.Payment.Service;
 
 import com.example.backendcinema.Payment.Config.ZalopayConfig;
 import com.example.backendcinema.Payment.cryto.HMACUtil;
+import com.example.backendcinema.Payment.modal.ZalopayTransaction;
+import com.example.backendcinema.Payment.repository.TransactionRepository;
 import com.example.backendcinema.Payment.request.ZalopayRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -10,19 +13,34 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ZalopayService {
 
-    private static String getCurrentTimeString(String format) {
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(ZalopayService.class);
+
+
+    private static String getCurrentTimeString() {
         Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT+7"));
-        SimpleDateFormat fmt = new SimpleDateFormat(format);
+        SimpleDateFormat fmt = new SimpleDateFormat("yyMMdd");
         fmt.setCalendar(cal);
         return fmt.format(cal.getTimeInMillis());
     }
@@ -39,16 +57,19 @@ public class ZalopayService {
 
         Map<String, Object> order = new HashMap<>();
         order.put("app_id", ZalopayConfig.config.get("app_id"));
-        order.put("app_trans_id", getCurrentTimeString("yyMMdd") + "_" + randomId);
+        order.put("app_trans_id", getCurrentTimeString() + "_" + randomId);
         order.put("app_time", System.currentTimeMillis());
         order.put("app_user", "user123");
         order.put("amount", amount);
         order.put("description", "HP Cinema - Payment #" + randomId);
         order.put("bank_code", "");
         order.put("item", "[{}]");
-        order.put("embed_data", "{}");
+        JSONObject embedDataJson = new JSONObject();
+        embedDataJson.put("redirecturl", "https://my-app-tau-kohl.vercel.app/");
+        order.put("embed_data", embedDataJson.toString());
+
         order.put("callback_url",
-                "https://my-app-tau-kohl.vercel.app/");
+                "https://d87b-116-96-47-23.ngrok-free.app/api/zalopay/callback");
 
         String data = order.get("app_id") + "|" + order.get("app_trans_id") + "|" + order.get("app_user") + "|"
                 + order.get("amount") + "|" + order.get("app_time") + "|" + order.get("embed_data") + "|"
