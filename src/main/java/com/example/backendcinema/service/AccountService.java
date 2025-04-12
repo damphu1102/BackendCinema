@@ -25,5 +25,8 @@ public interface AccountService extends UserDetailsService {
 
     boolean authenticateUser(String username, String password);
 
+    boolean authenticateAdmin(String username, String password);
+
+
 
 }

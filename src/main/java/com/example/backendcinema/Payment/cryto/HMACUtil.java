@@ -2,6 +2,7 @@ package com.example.backendcinema.Payment.cryto;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.LinkedList;
@@ -16,7 +17,7 @@ public class HMACUtil {
     public final static String HMACSHA1 = "HmacSHA1";
     public final static String HMACSHA256 = "HmacSHA256";
     public final static String HMACSHA512 = "HmacSHA512";
-    public final static Charset UTF8CHARSET = Charset.forName("UTF-8");
+    public final static Charset UTF8CHARSET = StandardCharsets.UTF_8;
 
     public final static LinkedList<String> HMACS = new LinkedList<String>(Arrays.asList("UnSupport", "HmacSHA256", "HmacMD5", "HmacSHA384", "HMacSHA1", "HmacSHA512"));
     // @formatter:on
@@ -25,9 +26,9 @@ public class HMACUtil {
         Mac macGenerator = null;
         try {
             macGenerator = Mac.getInstance(algorithm);
-            SecretKeySpec signingKey = new SecretKeySpec(key.getBytes("UTF-8"), algorithm);
+            SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), algorithm);
             macGenerator.init(signingKey);
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
 
         if (macGenerator == null) {
@@ -35,10 +36,7 @@ public class HMACUtil {
         }
 
         byte[] dataByte = null;
-        try {
-            dataByte = data.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-        }
+        dataByte = data.getBytes(StandardCharsets.UTF_8);
 
         return macGenerator.doFinal(dataByte);
     }

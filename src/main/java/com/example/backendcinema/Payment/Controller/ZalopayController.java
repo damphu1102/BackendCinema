@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/zalopay")
@@ -26,6 +26,11 @@ public class ZalopayController {
     public ResponseEntity<String> getOrderStatus(@PathVariable String appTransId) {
         String response = zalopayService.getOrderStatus(appTransId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/callback")
+    public String zalopayCallback(@RequestParam Map<String, String> queryParams) {
+        return zalopayService.processCallback(queryParams);
     }
 
 }

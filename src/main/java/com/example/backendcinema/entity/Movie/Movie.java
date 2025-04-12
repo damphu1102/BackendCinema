@@ -49,8 +49,6 @@ public class Movie {
     @Enumerated(EnumType.STRING)
     private LanguageMovie language;
 
-    @Column(name = "RATING")
-    private double rating;
 
     @Column(name = "GENRE", nullable = false)
     @Enumerated(EnumType.STRING)

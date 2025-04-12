@@ -50,6 +50,11 @@ public class AccountController {
         return accountService.authenticateUser(request.getUserName(), request.getPassWord());
     }
 
+    @PostMapping("/authenticateAdmin")
+    public boolean authenticateAdmin(@RequestBody LoginRequest request) {
+        return accountService.authenticateAdmin(request.getUserName(), request.getPassWord());
+    }
+
     @PostMapping("/create")
     public Account create(@RequestBody AccountCreateDto dto){
         return accountService.create(dto);

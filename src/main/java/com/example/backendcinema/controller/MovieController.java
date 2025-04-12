@@ -8,6 +8,7 @@ import modal.Movie.MovieSearchReq;
 import modal.Movie.MovieStatusReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,8 @@ public class MovieController {
     private MovieService movieService; // Làm việc với đối tượng interface
 
 //    Tìm kiếm theo tên và phân trang
+
+    @PreAuthorize("hasAnyAuthority('Admin')")
     @GetMapping("/search")
     public Page<Movie> findByMovie(MovieSearchReq request){
         return movieService.search(request);
@@ -40,17 +43,20 @@ public class MovieController {
         return movieService.findById(movieId);
     }
 
+    @PreAuthorize("hasAnyAuthority('Admin')")
     @DeleteMapping("/delete/{movieId}")
     public String delete(@PathVariable int movieId){
          movieService.delete(movieId);
          return "Xóa thành công";
     }
 
+    @PreAuthorize("hasAnyAuthority('Admin')")
     @PostMapping("/create")
     public Movie create(@RequestBody MovieDtoCreate dto){
         return movieService.create(dto);
     }
 
+    @PreAuthorize("hasAnyAuthority('Admin')")
     @PutMapping("/update/{movieId}")
     public Movie update(@RequestBody MovieDtoUpdate dto){
         return movieService.update(dto);

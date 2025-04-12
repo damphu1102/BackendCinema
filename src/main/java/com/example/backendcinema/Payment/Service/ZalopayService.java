@@ -5,7 +5,6 @@ import com.example.backendcinema.Payment.cryto.HMACUtil;
 import com.example.backendcinema.Payment.modal.ZalopayTransaction;
 import com.example.backendcinema.Payment.repository.TransactionRepository;
 import com.example.backendcinema.Payment.request.ZalopayRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -17,17 +16,15 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Service
 public class ZalopayService {
@@ -55,7 +52,7 @@ public class ZalopayService {
 
         int amount = zaloPayRequest.getAmount();
 
-        Map<String, Object> order = new HashMap<>();
+        Map<String, Object> order = new LinkedHashMap<>();
         order.put("app_id", ZalopayConfig.config.get("app_id"));
         order.put("app_trans_id", getCurrentTimeString() + "_" + randomId);
         order.put("app_time", System.currentTimeMillis());
@@ -65,11 +62,11 @@ public class ZalopayService {
         order.put("bank_code", "");
         order.put("item", "[{}]");
         JSONObject embedDataJson = new JSONObject();
-        embedDataJson.put("redirecturl", "https://my-app-tau-kohl.vercel.app/");
+        embedDataJson.put("redirecturl", "http://localhost:3000/");
         order.put("embed_data", embedDataJson.toString());
 
         order.put("callback_url",
-                "https://d87b-116-96-47-23.ngrok-free.app/api/zalopay/callback");
+                "https://my-app-gamma-rosy-67.vercel.app//api/zalopay/callback");
 
         String data = order.get("app_id") + "|" + order.get("app_trans_id") + "|" + order.get("app_user") + "|"
                 + order.get("amount") + "|" + order.get("app_time") + "|" + order.get("embed_data") + "|"
@@ -98,7 +95,7 @@ public class ZalopayService {
                     resultJsonStr.append(line);
                 }
 
-                System.out.println("Zalopay Response: " + resultJsonStr.toString());
+//                System.out.println("Zalopay Response: " + resultJsonStr.toString());
 
                 return resultJsonStr.toString();
             }
@@ -138,4 +135,55 @@ public class ZalopayService {
         }
     }
 
+    public String processCallback(@RequestParam Map<String, String> queryParams) {
+        logger.info("Received Zalopay callback with parameters: {}", queryParams);
+
+        String amount = queryParams.get("amount");
+        String appid = queryParams.get("appid");
+        String apptransid = queryParams.get("apptransid");
+        String bankcode = queryParams.get("bankcode");
+        String checksumReceived = queryParams.get("checksum");
+        String discountamount = queryParams.get("discountamount");
+        String pmcid = queryParams.get("pmcid");
+        String status = queryParams.get("status");
+
+        // Tạo chuỗi dữ liệu để kiểm tra checksum
+        String data = appid + "|" + apptransid + "|" + pmcid + "|" + bankcode + "|" + amount + "|" + discountamount + "|" + status;
+        String generatedChecksum = HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, ZalopayConfig.config.get("key2"), data);
+
+        logger.info("Received Checksum: {}", checksumReceived);
+        logger.info("Generated Checksum: {}", generatedChecksum);
+
+        assert generatedChecksum != null;
+        if (generatedChecksum.equals(checksumReceived)) {
+            logger.info("Checksum validation successful for apptransid: {}", apptransid);
+
+            try {
+                String orderStatusResponse = getOrderStatus(apptransid);
+                JSONObject orderStatusJson = new JSONObject(orderStatusResponse);
+                String returnMessage = orderStatusJson.optString("return_message");
+                long serverTime = orderStatusJson.optLong("server_time");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                sdf.setTimeZone(TimeZone.getTimeZone("GMT+7")); // Đảm bảo đúng múi giờ Việt Nam
+                String formattedServerTime = sdf.format(new Date(serverTime));
+
+                ZalopayTransaction transaction = new ZalopayTransaction();
+                transaction.setAppTransId(apptransid);
+                transaction.setAmount(Integer.parseInt(amount));
+                transaction.setStatus(Integer.parseInt(status));
+                transaction.setMessage(returnMessage);
+                transaction.setTimestamp(formattedServerTime);
+                transactionRepository.save(transaction);
+                logger.info("Transaction saved successfully for apptransid: {}", apptransid);
+                return "{\"return_code\": 1, \"return_message\": \"success\"}";
+            } catch (Exception e) {
+                logger.error("Error saving transaction for apptransid: {}", apptransid, e);
+                return "{\"return_code\": 0, \"return_message\": \"Failed to save transaction\"}";
+            }
+
+        } else {
+            logger.warn("Checksum validation failed for apptransid: {}", apptransid);
+            return "{\"return_code\": 0, \"return_message\": \"checksum fail\"}";
+        }
+    }
 }
