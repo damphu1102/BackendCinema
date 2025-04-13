@@ -32,6 +32,9 @@ public class Seat {
     @Column(name = "IMG_SELECTED",length = 255, nullable = false)
     private String imgSelected;
 
+    @Column(name = "IMG_SUCCESS",length = 255, nullable = false)
+    private String imgSuccess;
+
     @Column(name = "SEAT_PRICE")
     private int seatPrice;
 }

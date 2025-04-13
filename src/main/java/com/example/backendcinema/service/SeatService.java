@@ -13,4 +13,6 @@ public interface SeatService {
     List<Seat> filterRow(SeatRowReq request);
 
     Seat updateSeatStatus(int seat_id, SeatStatus newStatus);
+
+    void resetAllSeatStatusToUnselected();
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,12 +23,7 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     public List<Seat> getAll() {
-        List<Seat> seats = seatRepository.findAll();
-        // Đặt lại seatStatus về un_selected cho mỗi ghế
-        return seats.stream().peek(seat -> {
-            seat.setSeatStatus(SeatStatus.un_selected);
-            seatRepository.save(seat); // Lưu thay đổi vào cơ sở dữ liệu
-        }).collect(Collectors.toList());
+        return seatRepository.findAll();
     }
 
     @Override
@@ -38,12 +34,23 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     public Seat updateSeatStatus(int seat_id, SeatStatus newStatus) {
-        Optional<Seat> optionalSeat = seatRepository.findById((int) seat_id);
+        Optional<Seat> optionalSeat = seatRepository.findById(seat_id);
         if (optionalSeat.isPresent()) {
             Seat seat = optionalSeat.get();
             seat.setSeatStatus(newStatus);
             return seatRepository.save(seat);
         }
         return null;
+    }
+
+    @Transactional
+    public void resetAllSeatStatusToUnselected() {
+        List<Seat> seats = seatRepository.findAll();
+        seats.forEach(seat -> {
+            if (seat.getSeatStatus() != SeatStatus.success) {
+                seat.setSeatStatus(SeatStatus.un_selected);
+                seatRepository.save(seat);
+            }
+        });
     }
 }

@@ -6,6 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<ZalopayTransaction, String> {
-    // Bạn có thể thêm các truy vấn tùy chỉnh tại đây nếu cần
-    ZalopayTransaction findByAppTransId(String appTransId);
 }

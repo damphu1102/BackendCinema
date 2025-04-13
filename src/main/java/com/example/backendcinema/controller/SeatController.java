@@ -5,6 +5,7 @@ import com.example.backendcinema.entity.Seat.SeatStatus;
 import com.example.backendcinema.service.SeatService;
 import modal.Seat.SeatRowReq;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +40,11 @@ public class SeatController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(updatedSeat);
+    }
+
+    @PostMapping("/reset-all")
+    public ResponseEntity<String> resetAllSeats() {
+        seatService.resetAllSeatStatusToUnselected();
+        return new ResponseEntity<>("All seat statuses have been reset to un_selected.", HttpStatus.OK);
     }
 }
