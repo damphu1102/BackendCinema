@@ -54,7 +54,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/seat/{seat_id}/{newStatus}", "/account/{accountId}",
                         "/account/updatePassword").hasAuthority("User")
                 .antMatchers(HttpMethod.GET,
-                        "/account/{accountId}").hasAuthority("User")
+                        "/account/{accountId}", "/api/zalopay/transactions/{accountId}",
+                        "/api/zalopay/fillter/{appTransId}").hasAuthority("User")
 
                 .antMatchers(HttpMethod.POST ,
                         "/seat/reset-all").hasAuthority("User")

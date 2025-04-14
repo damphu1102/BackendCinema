@@ -26,11 +26,4 @@ public class ShowTime {
     @Column(name = "ROOM_SHOW", length = 10, nullable = false)
     private String roomShow;
 
-//    @ManyToOne
-//    @JoinColumn(name = "movie_id")
-//    private Movie movie;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "cinema_id")
-//    private Cinema cinema;
 }

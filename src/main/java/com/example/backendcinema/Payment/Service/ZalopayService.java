@@ -2,9 +2,9 @@ package com.example.backendcinema.Payment.Service;
 
 import com.example.backendcinema.Payment.Config.ZalopayConfig;
 import com.example.backendcinema.Payment.cryto.HMACUtil;
-import com.example.backendcinema.Payment.modal.OrderSeat;
+import com.example.backendcinema.Payment.modal.OrderIntermediate;
 import com.example.backendcinema.Payment.modal.ZalopayTransaction;
-import com.example.backendcinema.Payment.repository.OrderSeatRepository;
+import com.example.backendcinema.Payment.repository.OrderIntermediateRepository;
 import com.example.backendcinema.Payment.repository.TransactionRepository;
 import com.example.backendcinema.Payment.request.ZalopayRequest;
 import com.example.backendcinema.entity.Seat.SeatStatus;
@@ -40,7 +40,7 @@ public class ZalopayService {
     private SeatRepository seatRepository;
 
     @Autowired
-    private OrderSeatRepository orderSeatRepository;
+    private OrderIntermediateRepository orderIntermediateRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(ZalopayService.class);
 
@@ -64,18 +64,37 @@ public class ZalopayService {
 
         int amount = zaloPayRequest.getAmount();
         List<Integer> selectedSeats = zaloPayRequest.getSelectedSeats();
+        String accountId = zaloPayRequest.getAccountId();
+        String movieName = zaloPayRequest.getMovieName();
+        String cinema = zaloPayRequest.getCinema();
+        List<String> roomList = zaloPayRequest.getRoom();
+        List<String> seatNumberList = zaloPayRequest.getSeatNumber();
+        String date = zaloPayRequest.getDate();
+        String time = zaloPayRequest.getTime();
+
 
         // Lưu thông tin ghế đã chọn vào bảng tạm
-        for (Integer seatId : selectedSeats) {
-            OrderSeat orderSeat = new OrderSeat(appTransId, seatId);
-            orderSeatRepository.save(orderSeat);
+        // Cần đảm bảo số lượng seatId và seatNumber đồng bộ
+        if (selectedSeats.size() != seatNumberList.size()) {
+            logger.error("Số lượng seatId và seatNumber không khớp.");
+            return "{\"error\": \"Số lượng ghế và số ghế không khớp.\"}";
+        }
+
+        for (int i = 0; i < selectedSeats.size(); i++) {
+            Integer seatId = selectedSeats.get(i);
+            String seatNumber = seatNumberList.get(i);
+            String room = roomList.get(i);
+            OrderIntermediate orderIntermediate = new OrderIntermediate(
+                    appTransId, seatId, accountId,
+                    movieName, cinema, seatNumber, room, time , date);
+            orderIntermediateRepository.save(orderIntermediate);
         }
 
         Map<String, Object> order = new LinkedHashMap<>();
         order.put("app_id", ZalopayConfig.config.get("app_id"));
         order.put("app_trans_id", getCurrentTimeString() + "_" + randomId);
         order.put("app_time", System.currentTimeMillis());
-        order.put("app_user", "user123");
+        order.put("app_user", accountId);
         order.put("amount", amount);
         order.put("description", "HP Cinema - Payment #" + randomId);
         order.put("bank_code", "");
@@ -85,6 +104,7 @@ public class ZalopayService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             embedDataJson.put("selected_seats", objectMapper.writeValueAsString(selectedSeats));
+            embedDataJson.put("account_id", accountId);
             logger.info("Embed Data JSON sent to Zalopay: {}", embedDataJson); // Thêm dòng log này
         } catch (Exception e) {
             logger.error("Error converting selected seats to JSON", e);
@@ -172,6 +192,36 @@ public class ZalopayService {
         String discountamount = queryParams.get("discountamount");
         String pmcid = queryParams.get("pmcid");
         String status = queryParams.get("status");
+        String accountIdFromOrderSeat = null;
+        String movieNameFromOrderSeat = null;
+        String cinemaFromOrderSeat = null;
+        String roomFromOrderSeat = null;
+        String seatNumberFromOrderSeat = null;
+        String dateFromOrderSeat = null;
+        String timeFromOrderSeat = null;
+
+        List<OrderIntermediate> orderSeatsForTransaction = orderIntermediateRepository.findByAppTransId(apptransid);
+        if (!orderSeatsForTransaction.isEmpty()) {
+            OrderIntermediate firstOrder = orderSeatsForTransaction.get(0);
+            accountIdFromOrderSeat = firstOrder.getAccountId();
+            movieNameFromOrderSeat = firstOrder.getMovieName();
+            cinemaFromOrderSeat = firstOrder.getCinema();
+            roomFromOrderSeat = firstOrder.getRoom();
+            seatNumberFromOrderSeat = firstOrder.getSeatNumber();
+            dateFromOrderSeat = firstOrder.getDate();
+            timeFromOrderSeat = firstOrder.getTime();
+
+            logger.info("Account ID retrieved from OrderIntermediate: {}", accountIdFromOrderSeat);
+            logger.info("Movie Name retrieved from OrderIntermediate: {}", movieNameFromOrderSeat);
+            logger.info("Cinema retrieved from OrderIntermediate: {}", cinemaFromOrderSeat);
+            logger.info("Room retrieved from OrderIntermediate: {}", roomFromOrderSeat);
+            logger.info("Seat Number retrieved from OrderIntermediate: {}", seatNumberFromOrderSeat);
+            logger.info("Date retrieved from OrderIntermediate: {}", dateFromOrderSeat);
+            logger.info("Time retrieved from OrderIntermediate: {}", timeFromOrderSeat);
+
+        } else {
+            logger.warn("No OrderIntermediate found for apptransid: {}", apptransid);
+        }
 
 
         // Tạo chuỗi dữ liệu để kiểm tra checksum
@@ -201,21 +251,29 @@ public class ZalopayService {
                 transaction.setStatus(Integer.parseInt(status));
                 transaction.setMessage(returnMessage);
                 transaction.setTimestamp(formattedServerTime);
+                transaction.setAccountId(accountIdFromOrderSeat); // Lưu accountId từ OrderIntermediate
+                transaction.setMovieName(movieNameFromOrderSeat); // Lưu movieName
+                transaction.setCinema(cinemaFromOrderSeat); // Lưu cinema
+                transaction.setRoom(roomFromOrderSeat); // Lưu room
+                transaction.setSeatNumber(seatNumberFromOrderSeat); // Lưu seatNumber
+                transaction.setDate(dateFromOrderSeat); // Lưu date
+                transaction.setTime(timeFromOrderSeat); // Lưu time
+                transactionRepository.save(transaction);
                 transactionRepository.save(transaction);
                 logger.info("Transaction saved successfully for apptransid: {}", apptransid);
 
                 // Cập nhật trạng thái ghế nếu giao dịch thành công
                 if (status.equals("1") && returnCode == 1) {
-                    List<OrderSeat> orderSeats = orderSeatRepository.findByAppTransId(apptransid);
-                    for (OrderSeat orderSeat : orderSeats) {
-                        seatRepository.findById(orderSeat.getSeatId()).ifPresent(seat -> {
+                    List<OrderIntermediate> orderIntermediates = orderIntermediateRepository.findByAppTransId(apptransid);
+                    for (OrderIntermediate orderIntermediate : orderIntermediates) {
+                        seatRepository.findById(orderIntermediate.getSeatId()).ifPresent(seat -> {
                             seat.setSeatStatus(SeatStatus.success);
                             seatRepository.save(seat);
                             logger.info("Updated status to success for seat ID: {} (apptransid: {})", seat.getSeat_id(), apptransid);
                         });
                     }
                     // Tùy chọn: Xóa thông tin ghế tạm sau khi cập nhật thành công
-                    orderSeatRepository.deleteAll(orderSeats);
+                    orderIntermediateRepository.deleteAll(orderIntermediates);
                     logger.info("Deleted temporary order seat information for apptransid: {}", apptransid);
                 }
 
@@ -230,4 +288,15 @@ public class ZalopayService {
             return "{\"return_code\": 0, \"return_message\": \"checksum fail\"}";
         }
     }
+
+    public List<ZalopayTransaction> getTransactionsByAccountId(String accountId) {
+        logger.info("Fetching transactions for accountId: {}", accountId);
+        return transactionRepository.findByAccountId(accountId);
+    }
+
+    public List<ZalopayTransaction> getTransactionsByAppTransId(String appTransId) {
+        logger.info("Fetching transactions for appTransId: {}", appTransId);
+        return transactionRepository.findByAppTransId(appTransId);
+    }
+
 }
