@@ -1,6 +1,7 @@
 package com.example.backendcinema.entity.Movie;
 
 
+import com.example.backendcinema.Converter.GenreMovieConverter;
 import com.example.backendcinema.entity.ShowTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,9 +50,8 @@ public class Movie {
     @Enumerated(EnumType.STRING)
     private LanguageMovie language;
 
-
+    @Convert(converter = GenreMovieConverter.class)
     @Column(name = "GENRE", nullable = false)
-    @Enumerated(EnumType.STRING)
     private GenreMovie genre;
 
     @Column(name = "VIEWING_AGE", nullable = false)
@@ -66,7 +66,4 @@ public class Movie {
     @Column(name = "STATUS_MOVIE", nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusMovie statusMovie;
-
-//    @OneToMany(mappedBy = "movie")
-//    private List<ShowTime> showTimes;
 }

@@ -1,5 +1,6 @@
 package com.example.backendcinema.entity.Cinema;
 
+import com.example.backendcinema.Converter.LocationEnumConverter;
 import com.example.backendcinema.entity.ShowTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,11 +21,9 @@ public class Cinema {
     @Column(name = "CINEMA_NAME", length = 100, nullable = false, unique = true)
     private String cinemaName;
 
-    @Enumerated(EnumType.STRING) // Lưu giá trị enum dưới dạng chuỗi trong database
+    @Convert(converter = LocationEnumConverter.class)
     @Column(name = "LOCATION", nullable = false)
     private LocationEnum locationEnum;
 
-//    @OneToMany(mappedBy = "cinema")
-//    private List<ShowTime> showTimes;
 }
 

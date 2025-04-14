@@ -39,7 +39,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/movie/filter", "/movie/{movieId}", "/zalopay/order",
                         "/account/create", "/account/check_username", "/account/authenticateUser", "/account/check_pass",
                         "/api/vnpay","/api/vnpay/return", "/api/zalopay", "/api/zalopay/order-status/{appTransId}",
-                        "/api/zalopay/callback", "/account/authenticateAdmin", "/seat/reset-all").permitAll()
+                        "/api/zalopay/callback", "/account/authenticateAdmin").permitAll()
 
 // Config những API phải có Authority là Admin thì mới được truy cập
                 .antMatchers(HttpMethod.GET, "/account", "/movie/search").hasAuthority("Admin")
@@ -50,9 +50,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
 // Config những API phải có Authority là User thì mới được truy cập
-                .antMatchers(HttpMethod.PUT, "/seat/{seat_id}/{newStatus}", "/account/{accountId}",
+                .antMatchers(HttpMethod.PUT,
+                        "/seat/{seat_id}/{newStatus}", "/account/{accountId}",
                         "/account/updatePassword").hasAuthority("User")
-                .antMatchers(HttpMethod.GET, "/account/{accountId}").hasAuthority("User")
+                .antMatchers(HttpMethod.GET,
+                        "/account/{accountId}").hasAuthority("User")
+
+                .antMatchers(HttpMethod.POST ,
+                        "/seat/reset-all").hasAuthority("User")
 
 
 // Config những API phải có Authority là ADMIN hoặc User thì mới được truy cập

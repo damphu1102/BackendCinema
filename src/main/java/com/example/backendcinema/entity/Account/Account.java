@@ -1,5 +1,6 @@
 package com.example.backendcinema.entity.Account;
 
+import com.example.backendcinema.Converter.RoleGenderConverter;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -43,8 +44,8 @@ public class Account {
     @Column(name = "DATE_BIRD")
     private LocalDate dateBird;
 
+    @Convert(converter = RoleGenderConverter.class)
     @Column(name = "ROLE_GENDER")
-    @Enumerated(EnumType.STRING)
     private RoleGender roleGender;
 
     @Column(name = "ROLE_ACCOUNT", nullable = false)

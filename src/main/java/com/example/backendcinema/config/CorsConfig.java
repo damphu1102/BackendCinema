@@ -10,7 +10,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // Cho phép CORS cho tất cả các endpoint
-                .allowedOrigins("http://localhost:3000", "https://my-app-tau-kohl.vercel.app") // Cho phép yêu cầu từ frontend của bạn
+                .allowedOrigins("http://localhost:3000", "https://my-app-gamma-rosy-67.vercel.app/") // Cho phép yêu cầu từ frontend của bạn
                 .allowedMethods("GET", "POST", "PUT", "DELETE"); // Cho phép các phương thức HTTP
     }
 }
