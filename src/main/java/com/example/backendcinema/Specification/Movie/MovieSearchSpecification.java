@@ -4,8 +4,7 @@ import com.example.backendcinema.entity.Movie.Movie;
 import modal.Movie.MovieSearchReq;
 import org.springframework.data.jpa.domain.Specification;
 
-public class MovieSpecification {
-
+public class MovieSearchSpecification {
     public static Specification<Movie> buildCondition(MovieSearchReq request){
         return Specification.where(buildWithMovieName(request));
     }

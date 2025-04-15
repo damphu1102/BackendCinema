@@ -22,6 +22,9 @@ public class ServiceMovie {
     @Column(name = "DESCRIPTION_SERVICE", length = 255, nullable = false)
     private String descriptionService;
 
+    @Column(name = "IMAGE_SERVICE", length = 255, nullable = false)
+    private String imageService;
+
     @Column(name = "PRICE_SERVICE", nullable = false)
     private int priceService;
 

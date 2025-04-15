@@ -5,6 +5,7 @@ import com.example.backendcinema.Dto.Movie.MovieDtoUpdate;
 import com.example.backendcinema.entity.Movie.Movie;
 import com.example.backendcinema.service.MovieService;
 import modal.Movie.MovieSearchReq;
+import modal.Movie.MovieSearchReqAndPagination;
 import modal.Movie.MovieStatusReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,8 +26,13 @@ public class MovieController {
 
     @PreAuthorize("hasAnyAuthority('Admin')")
     @GetMapping("/search")
-    public Page<Movie> findByMovie(MovieSearchReq request){
+    public Page<Movie> findByMovie(MovieSearchReqAndPagination request){
         return movieService.search(request);
+    }
+
+    @GetMapping("/searchList")
+    public List<Movie> findByMovieList(MovieSearchReq request){
+        return movieService.searchList(request);
     }
 
 //    Lọc dữ liệu theo status

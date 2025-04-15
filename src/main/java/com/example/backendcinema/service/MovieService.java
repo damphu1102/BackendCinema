@@ -4,6 +4,7 @@ import com.example.backendcinema.Dto.Movie.MovieDtoCreate;
 import com.example.backendcinema.Dto.Movie.MovieDtoUpdate;
 import com.example.backendcinema.entity.Movie.Movie;
 import modal.Movie.MovieSearchReq;
+import modal.Movie.MovieSearchReqAndPagination;
 import modal.Movie.MovieStatusReq;
 import org.springframework.data.domain.Page;
 
@@ -26,9 +27,12 @@ public interface MovieService {
     void delete(int movie_id);
 
 //    Tìm kiếm (theo tên) và phân trang
-    Page<Movie> search(MovieSearchReq request);
+    Page<Movie> search(MovieSearchReqAndPagination request);
 
 //    Lọc dữ liệu theo Status
     List<Movie> filter(MovieStatusReq request);
+
+    //    Tìm kiếm (theo tên)
+    List<Movie> searchList(MovieSearchReq request);
 
 }

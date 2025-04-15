@@ -2,12 +2,14 @@ package com.example.backendcinema.service.Impl;
 
 import com.example.backendcinema.Dto.Movie.MovieDtoCreate;
 import com.example.backendcinema.Dto.Movie.MovieDtoUpdate;
-import com.example.backendcinema.Specification.Movie.MovieSpecification;
+import com.example.backendcinema.Specification.Movie.MovieSearchAndPaginationSpecification;
+import com.example.backendcinema.Specification.Movie.MovieSearchSpecification;
 import com.example.backendcinema.Specification.Movie.StatusSpecification;
 import com.example.backendcinema.entity.Movie.Movie;
 import com.example.backendcinema.repository.MovieRepository;
 import com.example.backendcinema.service.MovieService;
 import modal.Movie.MovieSearchReq;
+import modal.Movie.MovieSearchReqAndPagination;
 import modal.Movie.MovieStatusReq;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +62,9 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public Page<Movie> search(MovieSearchReq request) {
+    public Page<Movie> search(MovieSearchReqAndPagination request) {
 //        Đk tìm kiếm tổng hợp
-        Specification<Movie> specification = MovieSpecification.buildCondition(request);
+        Specification<Movie> specification = MovieSearchAndPaginationSpecification.buildCondition(request);
 
 //         Đk phân trang
         PageRequest pageRequest;
@@ -84,6 +86,13 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public List<Movie> filter(MovieStatusReq request) {
         Specification<Movie> specification = StatusSpecification.buildCondition(request);
+        return movieRepository.findAll(specification);
+    }
+
+    @Override
+    public List<Movie> searchList(MovieSearchReq request) {
+        Specification<Movie> specification = MovieSearchSpecification.buildCondition(request);
+
         return movieRepository.findAll(specification);
     }
 }
