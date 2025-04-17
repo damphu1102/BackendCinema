@@ -290,12 +290,12 @@ public class ZalopayService {
     }
 
     public List<ZalopayTransaction> getTransactionsByAccountId(String accountId) {
-        logger.info("Fetching transactions for accountId: {}", accountId);
+//        logger.info("Fetching transactions for accountId: {}", accountId);
         return transactionRepository.findByAccountId(accountId);
     }
 
     public List<ZalopayTransaction> getTransactionsByAppTransId(String appTransId) {
-        logger.info("Fetching transactions for appTransId: {}", appTransId);
+//        logger.info("Fetching transactions for appTransId: {}", appTransId);
         return transactionRepository.findByAppTransId(appTransId);
     }
 

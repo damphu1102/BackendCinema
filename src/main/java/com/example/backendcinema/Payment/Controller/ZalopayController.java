@@ -15,6 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/zalopay")
+@CrossOrigin("*")
 public class ZalopayController {
 
     @Autowired
