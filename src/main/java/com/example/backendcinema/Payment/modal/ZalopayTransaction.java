@@ -1,12 +1,12 @@
 package com.example.backendcinema.Payment.modal;
 
+import com.example.backendcinema.Converter.StringListConverter;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -24,7 +24,10 @@ public class ZalopayTransaction {
     private String accountId;
     private String movieName;
     private String cinema;
-    private String seatNumber;
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "seat_number_list")
+    private List<String> seatNumberList;
+
     private String room;
     private String time;
     private String date;

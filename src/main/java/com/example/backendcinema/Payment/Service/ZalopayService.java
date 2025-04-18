@@ -72,12 +72,26 @@ public class ZalopayService {
         String date = zaloPayRequest.getDate();
         String time = zaloPayRequest.getTime();
 
+        // Handle room list - ensure it's always a list with proper size
+        if (roomList == null || roomList.isEmpty()) {
+            return "{\"error\": \"Room information is required\"}";
+        }
 
-        // Lưu thông tin ghế đã chọn vào bảng tạm
-        // Cần đảm bảo số lượng seatId và seatNumber đồng bộ
-        if (selectedSeats.size() != seatNumberList.size()) {
-            logger.error("Số lượng seatId và seatNumber không khớp.");
-            return "{\"error\": \"Số lượng ghế và số ghế không khớp.\"}";
+        // If there's only one room for multiple seats, duplicate it
+        if (roomList.size() == 1 && selectedSeats.size() > 1) {
+            String singleRoom = roomList.get(0);
+            roomList = Collections.nCopies(selectedSeats.size(), singleRoom);
+        }
+
+        // Validate data consistency
+        if (selectedSeats.isEmpty()) {
+            return "{\"error\": \"No seats selected\"}";
+        }
+
+        if (selectedSeats.size() != seatNumberList.size() || selectedSeats.size() != roomList.size()) {
+            logger.error("Data mismatch - seats: {}, seatNumbers: {}, rooms: {}",
+                    selectedSeats.size(), seatNumberList.size(), roomList.size());
+            return "{\"error\": \"Number of seats, seat numbers and rooms must match\"}";
         }
 
         for (int i = 0; i < selectedSeats.size(); i++) {
@@ -92,7 +106,7 @@ public class ZalopayService {
 
         Map<String, Object> order = new LinkedHashMap<>();
         order.put("app_id", ZalopayConfig.config.get("app_id"));
-        order.put("app_trans_id", getCurrentTimeString() + "_" + randomId);
+        order.put("app_trans_id", appTransId);
         order.put("app_time", System.currentTimeMillis());
         order.put("app_user", accountId);
         order.put("amount", amount);
@@ -196,7 +210,7 @@ public class ZalopayService {
         String movieNameFromOrderSeat = null;
         String cinemaFromOrderSeat = null;
         String roomFromOrderSeat = null;
-        String seatNumberFromOrderSeat = null;
+        List<String> seatNumbersFromOrderSeat = new ArrayList<>(); // Sử dụng List để lưu nhiều số ghế
         String dateFromOrderSeat = null;
         String timeFromOrderSeat = null;
 
@@ -207,15 +221,18 @@ public class ZalopayService {
             movieNameFromOrderSeat = firstOrder.getMovieName();
             cinemaFromOrderSeat = firstOrder.getCinema();
             roomFromOrderSeat = firstOrder.getRoom();
-            seatNumberFromOrderSeat = firstOrder.getSeatNumber();
             dateFromOrderSeat = firstOrder.getDate();
             timeFromOrderSeat = firstOrder.getTime();
+
+            for (OrderIntermediate order : orderSeatsForTransaction) {
+                seatNumbersFromOrderSeat.add(order.getSeatNumber()); // Thêm tất cả số ghế vào danh sách
+                logger.info("Seat Number retrieved from OrderIntermediate: {}", order.getSeatNumber());
+            }
 
             logger.info("Account ID retrieved from OrderIntermediate: {}", accountIdFromOrderSeat);
             logger.info("Movie Name retrieved from OrderIntermediate: {}", movieNameFromOrderSeat);
             logger.info("Cinema retrieved from OrderIntermediate: {}", cinemaFromOrderSeat);
             logger.info("Room retrieved from OrderIntermediate: {}", roomFromOrderSeat);
-            logger.info("Seat Number retrieved from OrderIntermediate: {}", seatNumberFromOrderSeat);
             logger.info("Date retrieved from OrderIntermediate: {}", dateFromOrderSeat);
             logger.info("Time retrieved from OrderIntermediate: {}", timeFromOrderSeat);
 
@@ -255,7 +272,7 @@ public class ZalopayService {
                 transaction.setMovieName(movieNameFromOrderSeat); // Lưu movieName
                 transaction.setCinema(cinemaFromOrderSeat); // Lưu cinema
                 transaction.setRoom(roomFromOrderSeat); // Lưu room
-                transaction.setSeatNumber(seatNumberFromOrderSeat); // Lưu seatNumber
+                transaction.setSeatNumberList(seatNumbersFromOrderSeat); // Lưu danh sách số ghế
                 transaction.setDate(dateFromOrderSeat); // Lưu date
                 transaction.setTime(timeFromOrderSeat); // Lưu time
                 transactionRepository.save(transaction);
