@@ -341,8 +341,8 @@ public class ZalopayService {
         message.setTo(toEmail);
         message.setSubject("Xác nhận đặt vé thành công tại HP Cinema");
         message.setText(String.format(
-                "Xin chào bạn,\n\n" +
-                        "Cảm ơn bạn đã đặt vé xem phim tại HP Cinema!\n\n" +
+                "**XIN CHÀO BẠN!**\n\n" +
+                        "**CẢM ƠN BẠN ĐÃ ĐẶT VÉ Ở HP CINEMA!**\n\n" +
                         "Thông tin đặt vé của bạn:\n" +
                         "- Phim: %s\n" +
                         "- Rạp: %s\n" +
