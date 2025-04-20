@@ -3,6 +3,7 @@ package com.example.backendcinema.service.Impl;
 import com.example.backendcinema.Dto.Account.AccountCreateDto;
 import com.example.backendcinema.Dto.Account.AccountUpdateDto;
 import com.example.backendcinema.Dto.Account.UpdatePassDto;
+import com.example.backendcinema.Dto.Account.UpdatePassEmailDto;
 import com.example.backendcinema.entity.Account.Account;
 import com.example.backendcinema.entity.Account.RoleAccount;
 import com.example.backendcinema.entity.Account.RoleGender;
@@ -97,6 +98,20 @@ public class AccountServiceImpl implements AccountService {
         } else {
             // Xử lý trường hợp tài khoản không tồn tại (ví dụ: ném ngoại lệ)
             throw new RuntimeException("Account not found with id: " + dto.getAccountId());
+        }
+    }
+
+    @Override
+    public void updatePassEmail(UpdatePassEmailDto dto) {
+       Account account = accountRepository.findByEmailAccount(dto.getEmailAccount());
+        if (account != null){
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            String encodedNewPassword = passwordEncoder.encode(dto.getNewPassWord());
+            account.setPassWord(encodedNewPassword);
+            accountRepository.save(account);
+        } else {
+            // Xử lý trường hợp tài khoản không tồn tại (ví dụ: ném ngoại lệ)
+            throw new RuntimeException("Account not found with email: " + dto.getEmailAccount());
         }
     }
 

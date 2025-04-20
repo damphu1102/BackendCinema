@@ -3,6 +3,7 @@ package com.example.backendcinema.controller;
 import com.example.backendcinema.Dto.Account.AccountCreateDto;
 import com.example.backendcinema.Dto.Account.AccountUpdateDto;
 import com.example.backendcinema.Dto.Account.UpdatePassDto;
+import com.example.backendcinema.Dto.Account.UpdatePassEmailDto;
 import com.example.backendcinema.entity.Account.Account;
 import com.example.backendcinema.service.AccountService;
 import modal.LoginRequest;
@@ -77,6 +78,17 @@ public class AccountController {
     public ResponseEntity<String> updatePassword(@RequestBody UpdatePassDto dto) {
         try {
             accountService.updatePass(dto);
+            return ResponseEntity.ok("Password updated successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+//    @PreAuthorize("hasAnyAuthority('User')")
+    @PutMapping("/updatePasswordEmail")
+    public ResponseEntity<String> updatePasswordEmail(@RequestBody UpdatePassEmailDto dto) {
+        try {
+            accountService.updatePassEmail(dto);
             return ResponseEntity.ok("Password updated successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

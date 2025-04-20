@@ -34,6 +34,8 @@ public class OrderIntermediate {
 
     private String date;
 
+    private String emailAccount;
+
 
     public OrderIntermediate(String appTransId, Integer seatId, String accountId,
                              String movieName, String cinema, String seatNumber,

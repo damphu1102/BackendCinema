@@ -21,6 +21,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -41,6 +43,10 @@ public class ZalopayService {
 
     @Autowired
     private OrderIntermediateRepository orderIntermediateRepository;
+
+    @Autowired
+    private JavaMailSender mailSender; // Inject JavaMailSender
+
 
     private static final Logger logger = LoggerFactory.getLogger(ZalopayService.class);
 
@@ -71,6 +77,7 @@ public class ZalopayService {
         List<String> seatNumberList = zaloPayRequest.getSeatNumber();
         String date = zaloPayRequest.getDate();
         String time = zaloPayRequest.getTime();
+        String emailAccount = zaloPayRequest.getEmailAccount();
 
         // Handle room list - ensure it's always a list with proper size
         if (roomList == null || roomList.isEmpty()) {
@@ -101,6 +108,7 @@ public class ZalopayService {
             OrderIntermediate orderIntermediate = new OrderIntermediate(
                     appTransId, seatId, accountId,
                     movieName, cinema, seatNumber, room, time , date);
+            orderIntermediate.setEmailAccount(emailAccount);
             orderIntermediateRepository.save(orderIntermediate);
         }
 
@@ -213,6 +221,7 @@ public class ZalopayService {
         List<String> seatNumbersFromOrderSeat = new ArrayList<>(); // Sử dụng List để lưu nhiều số ghế
         String dateFromOrderSeat = null;
         String timeFromOrderSeat = null;
+        String emailFromOrderCreation = null;
 
         List<OrderIntermediate> orderSeatsForTransaction = orderIntermediateRepository.findByAppTransId(apptransid);
         if (!orderSeatsForTransaction.isEmpty()) {
@@ -223,6 +232,7 @@ public class ZalopayService {
             roomFromOrderSeat = firstOrder.getRoom();
             dateFromOrderSeat = firstOrder.getDate();
             timeFromOrderSeat = firstOrder.getTime();
+            emailFromOrderCreation = firstOrder.getEmailAccount();
 
             for (OrderIntermediate order : orderSeatsForTransaction) {
                 seatNumbersFromOrderSeat.add(order.getSeatNumber()); // Thêm tất cả số ghế vào danh sách
@@ -235,6 +245,7 @@ public class ZalopayService {
             logger.info("Room retrieved from OrderIntermediate: {}", roomFromOrderSeat);
             logger.info("Date retrieved from OrderIntermediate: {}", dateFromOrderSeat);
             logger.info("Time retrieved from OrderIntermediate: {}", timeFromOrderSeat);
+            logger.info("Email retrieved from OrderIntermediate: {}", emailFromOrderCreation);
 
         } else {
             logger.warn("No OrderIntermediate found for apptransid: {}", apptransid);
@@ -292,6 +303,15 @@ public class ZalopayService {
                     // Tùy chọn: Xóa thông tin ghế tạm sau khi cập nhật thành công
                     orderIntermediateRepository.deleteAll(orderIntermediates);
                     logger.info("Deleted temporary order seat information for apptransid: {}", apptransid);
+
+                    // Gửi email thông báo
+                    if (emailFromOrderCreation != null) {
+                        sendPaymentSuccessEmail(emailFromOrderCreation, movieNameFromOrderSeat,
+                                cinemaFromOrderSeat, roomFromOrderSeat, seatNumbersFromOrderSeat,
+                                dateFromOrderSeat, timeFromOrderSeat, Integer.parseInt(amount));
+                    } else {
+                        logger.warn("Could not retrieve email for accountId: {}", accountIdFromOrderSeat);
+                    }
                 }
 
                 return "{\"return_code\": 1, \"return_message\": \"success\"}";
@@ -314,6 +334,31 @@ public class ZalopayService {
     public List<ZalopayTransaction> getTransactionsByAppTransId(String appTransId) {
 //        logger.info("Fetching transactions for appTransId: {}", appTransId);
         return transactionRepository.findByAppTransId(appTransId);
+    }
+
+    private void sendPaymentSuccessEmail(String toEmail, String movieName, String cinema, String room, List<String> seatNumbers, String date, String time, int amount) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Xác nhận đặt vé thành công tại HP Cinema");
+        message.setText(String.format(
+                "Xin chào bạn,\n\n" +
+                        "Cảm ơn bạn đã đặt vé xem phim tại HP Cinema!\n\n" +
+                        "Thông tin đặt vé của bạn:\n" +
+                        "- Phim: %s\n" +
+                        "- Rạp: %s\n" +
+                        "- Phòng: %s\n" +
+                        "- Ghế: %s\n" +
+                        "- Ngày: %s\n" +
+                        "- Giờ: %s\n" +
+                        "- Tổng tiền: %s VNĐ\n\n" +
+                        "Vui lòng đến rạp trước giờ chiếu để nhận vé. Chúc bạn có những giây phút xem phim tuyệt vời!\n\n" +
+                        "Trân trọng,\n" +
+                        "Đội ngũ HP Cinema",
+                movieName, cinema, room, String.join(", ", seatNumbers), date, time, String.format("%,d", amount)
+        ));
+
+        mailSender.send(message);
+        logger.info("Email xác nhận đặt vé đã được gửi đến: {}", toEmail);
     }
 
 }

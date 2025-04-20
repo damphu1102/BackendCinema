@@ -15,4 +15,5 @@ public class ZalopayRequest {
     private List<String> room; // Thay đổi thành List<String>
     private String time;
     private String date;
+    private String emailAccount;
 }
