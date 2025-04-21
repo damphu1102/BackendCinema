@@ -79,7 +79,7 @@ public class OtpServiceImpl implements OtpService {
     public boolean verifyOtp(String email, String otpCode) {
         logger.info("Bắt đầu xác thực mã OTP {} cho email: {}", otpCode, email);
         Optional<Otp> otpEntity = otpRepository.findByEmailAndOtpCode(email, otpCode);
-        boolean isValid = otpEntity.isPresent() && !otpEntity.get().getCreatedTime().plusMinutes(10).isBefore(LocalDateTime.now());
+        boolean isValid = otpEntity.isPresent() && !otpEntity.get().getCreatedTime().plusMinutes(3).isBefore(LocalDateTime.now());
         logger.info("Kết quả xác thực mã OTP {} cho email {}: {}", otpCode, email, isValid);
         return isValid;
     }

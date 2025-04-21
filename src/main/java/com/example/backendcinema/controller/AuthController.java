@@ -72,14 +72,14 @@ public class AuthController {
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<String> verifyOtp(@RequestParam String email, @RequestParam String otp) {
+    public ResponseEntity<Boolean> verifyOtp(@RequestParam String email, @RequestParam String otp) {
         logger.info("Nhận yêu cầu xác thực mã OTP {} cho email: {}", otp, email);
-        if (otpService.verifyOtp(email, otp)) {
+        boolean isValid = otpService.verifyOtp(email, otp);
+        if (isValid) {
             logger.info("Mã OTP {} cho email {} hợp lệ.", otp, email);
-            return ResponseEntity.ok("Mã OTP hợp lệ. Tài khoản của bạn đã được xác thực.");
         } else {
             logger.warn("Mã OTP {} cho email {} không hợp lệ hoặc đã hết hạn.", otp, email);
-            return ResponseEntity.badRequest().body("Mã OTP không hợp lệ hoặc đã hết hạn.");
         }
+        return ResponseEntity.ok(isValid);
     }
 }
