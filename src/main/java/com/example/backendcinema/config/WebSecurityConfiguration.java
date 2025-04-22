@@ -43,7 +43,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/account/updatePasswordEmail","/auth/send-otp","/auth/verify-otp").permitAll()
 
 // Config những API phải có Authority là Admin thì mới được truy cập
-                .antMatchers(HttpMethod.GET, "/account", "/movie/search").hasAuthority("Admin")
+                .antMatchers(HttpMethod.GET, "/account", "/movie/search", "/api/zalopay/getAllTranstion").hasAuthority("Admin")
                 .antMatchers(HttpMethod.PUT, "/account", "/movie/update/{movieId}").hasAuthority("Admin")
                 .antMatchers(HttpMethod.POST, "/account", "/movie/create").hasAuthority("Admin")
                 .antMatchers(HttpMethod.DELETE, "/account", "/delete/{movieId}").hasAuthority("Admin")

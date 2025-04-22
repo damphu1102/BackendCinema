@@ -26,6 +26,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.transaction.Transaction;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
@@ -359,6 +360,10 @@ public class ZalopayService {
 
         mailSender.send(message);
         logger.info("Email xác nhận đặt vé đã được gửi đến: {}", toEmail);
+    }
+
+    public List<ZalopayTransaction> getAllTranstion() {
+        return transactionRepository.findAll();
     }
 
 }
