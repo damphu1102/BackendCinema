@@ -18,7 +18,6 @@ public class MovieDtoUpdate {
     private LocalDate releaseDate;
     private int duration;
     private LanguageMovie language;
-    private double rating;
     private GenreMovie genre;
     private int viewingAge;
     private LocalDate createAt;

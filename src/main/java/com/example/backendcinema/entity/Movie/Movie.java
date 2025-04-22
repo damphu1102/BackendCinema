@@ -2,13 +2,13 @@ package com.example.backendcinema.entity.Movie;
 
 
 import com.example.backendcinema.Converter.GenreMovieConverter;
-import com.example.backendcinema.entity.ShowTime;
+import com.example.backendcinema.Converter.LanguageMovieConverter;
+import com.example.backendcinema.Converter.StatusMovieConverter;
 import lombok.Getter;
 import lombok.Setter;
 import javax.persistence.*;
 import javax.persistence.Table;
 import java.time.LocalDate;
-import java.util.List;
 
 
 @Entity
@@ -46,8 +46,8 @@ public class Movie {
     @Column(name = "RURATION", nullable = false)
     private int duration;
 
+    @Convert(converter = LanguageMovieConverter.class)
     @Column(name = "LANGUAGE", nullable = false)
-    @Enumerated(EnumType.STRING)
     private LanguageMovie language;
 
     @Convert(converter = GenreMovieConverter.class)
@@ -63,7 +63,7 @@ public class Movie {
     @Column(name = "UPDATE_DATE")
     private LocalDate updateDate;
 
+    @Convert(converter = StatusMovieConverter.class)
     @Column(name = "STATUS_MOVIE", nullable = false)
-    @Enumerated(EnumType.STRING)
     private StatusMovie statusMovie;
 }
