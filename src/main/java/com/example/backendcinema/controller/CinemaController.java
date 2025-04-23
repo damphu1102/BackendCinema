@@ -25,16 +25,19 @@ public class CinemaController {
         return cinemaService.getAll();
     }
 
+    @PreAuthorize("hasAnyAuthority('Admin')")
     @PostMapping("/create")
     public Cinema create(@RequestBody CinemaDtoCreate dto){
         return cinemaService.create(dto);
     }
 
+    @PreAuthorize("hasAnyAuthority('Admin')")
     @PutMapping("/update/{cinemaId}")
     public Cinema update(@RequestBody CinemaDtoUpdate dto){
         return cinemaService.update(dto);
     }
 
+    @PreAuthorize("hasAnyAuthority('Admin')")
     @DeleteMapping("/delete/{cinemaId}")
     public String delete(@PathVariable int cinemaId){
         cinemaService.delete(cinemaId);

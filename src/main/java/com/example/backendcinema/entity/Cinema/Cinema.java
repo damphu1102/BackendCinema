@@ -1,5 +1,6 @@
 package com.example.backendcinema.entity.Cinema;
 
+import com.example.backendcinema.Converter.ActivateCinemaConverter;
 import com.example.backendcinema.Converter.LocationEnumConverter;
 import com.example.backendcinema.entity.ShowTime;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table (name = "CINEMA")
-public class Cinema {
+public class   Cinema {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CINEMA_ID")
@@ -24,6 +25,10 @@ public class Cinema {
     @Convert(converter = LocationEnumConverter.class)
     @Column(name = "LOCATION", nullable = false)
     private LocationEnum locationEnum;
+
+    @Convert(converter = ActivateCinemaConverter.class)
+    @Column(name = "STATUS_ACTIVATE", nullable = false)
+    private StatusActivate statusActivate;
 
 }
 
