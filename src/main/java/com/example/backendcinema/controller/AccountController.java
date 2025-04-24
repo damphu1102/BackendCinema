@@ -24,13 +24,13 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('Manager')")
     @GetMapping
     public List<Account> getAllAccount(){
       return accountService.getAll();
     }
 
-    @PreAuthorize("hasAnyAuthority('User')")
+    @PreAuthorize("hasAnyAuthority('User') or hasAuthority('Admin')")
     @GetMapping("/{accountId}")
     public Account findById (@PathVariable int accountId){
         return accountService.findById(accountId);

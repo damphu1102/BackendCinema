@@ -58,7 +58,7 @@ public class ZalopayController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('Manager')")
     @GetMapping("/getAllTranstion")
     public List<ZalopayTransaction> getAllTranstion (){
         return zalopayService.getAllTranstion();

@@ -19,7 +19,7 @@ public class ShowTimeController {
     @Autowired
     private ShowTimeService showTimeService;
 
-    @PreAuthorize("hasAuthority('User')")
+    @PreAuthorize("hasAuthority('User') or hasAuthority('Admin')")
     @GetMapping
     public List<ShowTime> getAllShowTime(){
         return showTimeService.getALl();

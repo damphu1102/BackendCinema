@@ -145,7 +145,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public boolean authenticateAdmin(String username, String password) {
         Account account = accountRepository.findByUserName(username);
-        if (account == null || account.getRoleAccount() != RoleAccount.Admin) {
+        if (account == null || account.getRoleAccount() == RoleAccount.User) {
             return false;
         }
 

@@ -24,7 +24,7 @@ public class MovieController {
 
 //    Tìm kiếm theo tên và phân trang
 
-    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('Manager')")
     @GetMapping("/search")
     public Page<Movie> findByMovie(MovieSearchReqAndPagination request){
         return movieService.search(request);
@@ -49,20 +49,20 @@ public class MovieController {
         return movieService.findById(movieId);
     }
 
-    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('Manager')")
     @DeleteMapping("/delete/{movieId}")
     public String delete(@PathVariable int movieId){
          movieService.delete(movieId);
          return "Xóa thành công";
     }
 
-    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('Manager')")
     @PostMapping("/create")
     public Movie create(@RequestBody MovieDtoCreate dto){
         return movieService.create(dto);
     }
 
-    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('Manager')")
     @PutMapping("/update/{movieId}")
     public Movie update(@RequestBody MovieDtoUpdate dto){
         return movieService.update(dto);

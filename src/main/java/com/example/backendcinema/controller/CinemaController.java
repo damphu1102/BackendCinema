@@ -19,25 +19,25 @@ public class CinemaController {
     @Autowired
     private CinemaService cinemaService;
 
-    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('Manager')")
     @GetMapping
     public List<Cinema> getAllCinema(){
         return cinemaService.getAll();
     }
 
-    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('Manager')")
     @PostMapping("/create")
     public Cinema create(@RequestBody CinemaDtoCreate dto){
         return cinemaService.create(dto);
     }
 
-    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('Manager')")
     @PutMapping("/update/{cinemaId}")
     public Cinema update(@RequestBody CinemaDtoUpdate dto){
         return cinemaService.update(dto);
     }
 
-    @PreAuthorize("hasAnyAuthority('Admin')")
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('Manager')")
     @DeleteMapping("/delete/{cinemaId}")
     public String delete(@PathVariable int cinemaId){
         cinemaService.delete(cinemaId);

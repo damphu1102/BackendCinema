@@ -42,31 +42,23 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/api/zalopay/callback", "/account/authenticateAdmin", "/event", "/event/{eventId}",
                         "/account/updatePasswordEmail","/auth/send-otp","/auth/verify-otp").permitAll()
 
-// Config những API phải có Authority là Admin thì mới được truy cập
-                .antMatchers(HttpMethod.GET, "/account", "/movie/search", "/api/zalopay/getAllTranstion", "/cinema").hasAuthority("Admin")
-                .antMatchers(HttpMethod.PUT, "/account", "/movie/update/{movieId}", "/cinema/update/{cinemaId}").hasAuthority("Admin")
-                .antMatchers(HttpMethod.POST, "/account", "/movie/create",
-                        "/api/images/upload", "/cinema/create").hasAuthority("Admin")
-                .antMatchers(HttpMethod.DELETE, "/account", "/delete/{movieId}","/delete/{cinemaId}").hasAuthority("Admin")
-
-
-
 // Config những API phải có Authority là User thì mới được truy cập
-                .antMatchers(HttpMethod.PUT,
-                        "/seat/{seat_id}/{newStatus}", "/account/{accountId}",
+                .antMatchers(HttpMethod.PUT, "/seat/{seat_id}/{newStatus}", "/account/{accountId}",
                         "/account/updatePassword").hasAuthority("User")
-                .antMatchers(HttpMethod.GET,
-                        "/account/{accountId}", "/api/zalopay/transactions/{accountId}",
-                        "/api/zalopay/fillter/{appTransId}").hasAuthority("User")
+                .antMatchers(HttpMethod.GET, "/api/zalopay/transactions/{accountId}",
+                        "/api/zalopay/fillter/{appTransId}", "/cinema/filter").hasAuthority("User")
 
-                .antMatchers(HttpMethod.POST ,
-                        "/seat/reset-all").hasAuthority("User")
+                .antMatchers(HttpMethod.POST , "/seat/reset-all").hasAuthority("User")
 
 
-// Config những API phải có Authority là ADMIN hoặc User thì mới được truy cập
-                .antMatchers("/cinema", "/cinema/filter",
-                        "/showtime", "/showtime/filter",
-                        "/seat", "/service", "/voucher").hasAnyAuthority("Admin", "User")
+// Config những API phải có Authority là ADMIN hoặc User và ADMIN hoặc Manager thì mới được truy cập
+                .antMatchers("/showtime", "/showtime/filter",
+                        "/seat", "/service", "/voucher", "/account/{accountId}").hasAnyAuthority("Admin", "User")
+                .antMatchers("/account", "/movie/search", "/api/zalopay/getAllTranstion", "/cinema",
+                        "/movie/update/{movieId}", "/cinema/update/{cinemaId}", "/movie/create",
+                        "/api/images/upload", "/cinema/create", "/delete/{movieId}"
+                        ,"/delete/{cinemaId}").hasAnyAuthority("Admin", "Manager")
+
                 .anyRequest().authenticated()// Những đường dẫn còn lại cần được xác thực
                 .and().httpBasic()// Kích hoạt cấu hình http basic trong Spring Security
 
