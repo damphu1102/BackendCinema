@@ -48,6 +48,7 @@ public class ZalopayController {
         return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyAuthority('Admin') or hasAuthority('User')")
     @GetMapping("/fillter/{appTransId}")
     public ResponseEntity<List<ZalopayTransaction>> getTransactionsByAppTransId(@PathVariable String appTransId) {
         List<ZalopayTransaction> transactions = zalopayService.getTransactionsByAppTransId(appTransId);

@@ -1,5 +1,7 @@
 package com.example.backendcinema.controller;
 
+import com.example.backendcinema.Dto.Showtime.ShowtimeCreateDto;
+import com.example.backendcinema.Dto.Showtime.ShowtimeUpdateDto;
 import com.example.backendcinema.entity.ShowTime;
 import com.example.backendcinema.service.ShowTimeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,7 @@ public class ShowTimeController {
     @Autowired
     private ShowTimeService showTimeService;
 
-    @PreAuthorize("hasAuthority('User') or hasAuthority('Admin')")
+    @PreAuthorize("hasAuthority('User') or hasAuthority('Admin') or hasAuthority('Manager')")
     @GetMapping
     public List<ShowTime> getAllShowTime(){
         return showTimeService.getALl();
@@ -31,5 +33,24 @@ public class ShowTimeController {
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         List<ShowTime> showTimes = showTimeService.filter(date);
         return ResponseEntity.ok(showTimes);
+    }
+
+    @PreAuthorize("hasAuthority('Admin') or hasAuthority('Manager')")
+    @PostMapping("/create")
+    public ShowTime create (@RequestBody ShowtimeCreateDto dto){
+        return showTimeService.create(dto);
+    }
+
+    @PreAuthorize("hasAuthority('Admin') or hasAuthority('Manager')")
+    @PutMapping("/update/{showtimeId}")
+    public ShowTime update(@RequestBody ShowtimeUpdateDto dto){
+        return showTimeService.update(dto);
+    }
+
+    @PreAuthorize("hasAuthority('Admin') or hasAuthority('Manager')")
+    @DeleteMapping("/delete/{showtimeId}")
+    public String delete(@PathVariable int showtimeId){
+        showTimeService.delete(showtimeId);
+        return "Xóa thành công";
     }
 }

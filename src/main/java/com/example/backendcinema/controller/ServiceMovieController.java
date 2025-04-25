@@ -19,7 +19,7 @@ public class ServiceMovieController {
     @Autowired
     private ServiceMovieService serviceMovieService;
 
-    @PreAuthorize("hasAuthority('User')")
+    @PreAuthorize("hasAuthority('User') or hasAuthority('Admin') or hasAuthority('Manager')")
     @GetMapping
     public List<ServiceMovie> getAllService(){
         return serviceMovieService.getAll();

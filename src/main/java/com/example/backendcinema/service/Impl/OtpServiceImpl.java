@@ -42,7 +42,7 @@ public class OtpServiceImpl implements OtpService {
         String otp = generateOtp();
         String subject = "Mã OTP của bạn";
         String body = "Mã OTP của bạn là: " + otp +
-                "\n\nMã này sẽ hết hiệu lực trong vòng 10 phút.";
+                "\n\nMã này sẽ hết hiệu lực trong vòng 03 phút.";
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);

@@ -45,19 +45,21 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 // Config những API phải có Authority là User thì mới được truy cập
                 .antMatchers(HttpMethod.PUT, "/seat/{seat_id}/{newStatus}", "/account/{accountId}",
                         "/account/updatePassword").hasAuthority("User")
-                .antMatchers(HttpMethod.GET, "/api/zalopay/transactions/{accountId}",
-                        "/api/zalopay/fillter/{appTransId}", "/cinema/filter").hasAuthority("User")
+                .antMatchers(HttpMethod.GET, "/api/zalopay/transactions/{accountId}"
+                        , "/cinema/filter","/showtime/filter").hasAuthority("User")
 
                 .antMatchers(HttpMethod.POST , "/seat/reset-all").hasAuthority("User")
 
 
 // Config những API phải có Authority là ADMIN hoặc User và ADMIN hoặc Manager thì mới được truy cập
-                .antMatchers("/showtime", "/showtime/filter",
-                        "/seat", "/service", "/voucher", "/account/{accountId}").hasAnyAuthority("Admin", "User")
+                .antMatchers("/seat", "/voucher", "/account/{accountId}",
+                        "/api/zalopay/fillter/{appTransId}").hasAnyAuthority("Admin", "User")
                 .antMatchers("/account", "/movie/search", "/api/zalopay/getAllTranstion", "/cinema",
                         "/movie/update/{movieId}", "/cinema/update/{cinemaId}", "/movie/create",
                         "/api/images/upload", "/cinema/create", "/delete/{movieId}"
-                        ,"/delete/{cinemaId}").hasAnyAuthority("Admin", "Manager")
+                        ,"/delete/{cinemaId}", "/showtime/create", "/showtime/update/{showtimeId}"
+                        ,"/showtime/delete/{showtimeId}").hasAnyAuthority("Admin", "Manager")
+                .antMatchers("/showtime" , "/service").hasAnyAuthority("Admin", "User", "Manager")
 
                 .anyRequest().authenticated()// Những đường dẫn còn lại cần được xác thực
                 .and().httpBasic()// Kích hoạt cấu hình http basic trong Spring Security
